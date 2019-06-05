@@ -15,6 +15,31 @@ require([
     var $searchResultsCount;
     var $searchQuery;
 
+    // 
+    var deployedModules;
+    var deployedDataPaths;
+    var dataPathMap = {
+      'telamon': ['PDMS'],
+      'ultron': ['modelIDE', 'appIDE'],
+      'model-center': ['modelcenter'],
+      'appcenter': ['appcenter'],
+      'engine-manager': ['HyperCycle ML', 'developer document/flowEngine'], // and more
+      'autocv-backend': ['HyperCycle CV'],
+      'master-service': ['middleware/console'],
+      'pas': ['middleware/pas'],
+      'pms': ['middleware/pms'],
+      'pms': ['developer document/pms'],
+      'rtidb-console': ['middleware/RtiDB Console']
+    }
+
+    function isDeployed(pagePath) {
+      if (!deployedDataPaths) return true;
+      for (deployedPath of deployedDataPaths) {
+        if (pagePath.indexOf(deployedPath) > -1) return true
+      }
+      return false
+    }
+
     // Throttle search
     function throttle(fn, wait) {
         var timeout;
@@ -93,7 +118,7 @@ require([
         var results = [],
             index = -1;
         for (var page in INDEX_DATA) {
-            if ((index = INDEX_DATA[page].body.toLowerCase().indexOf(keyword.toLowerCase())) !== -1) {
+          if (isDeployed(page) && (index = INDEX_DATA[page].body.toLowerCase().indexOf(keyword.toLowerCase())) !== -1) {
                 results.push({
                     url: page,
                     title: INDEX_DATA[page].title,
@@ -173,6 +198,19 @@ require([
             showResult();
             closeSearch();
         });
+        var __hidden_base_path__ = window.__hidden_base_path__ || '';
+        $.getJSON(__hidden_base_path__ + '/config-center/v1/versions').then(function(data) {
+          try {
+            deployedModules = data.data.map(function(obj) { return obj.key.replace(/\|.+/, '') })
+            deployedDataPaths = deployedModules.reduce(function (acc, key) {
+              var paths = dataPathMap[key];
+              if (!paths) return acc;
+              return acc.concat(paths);
+            }, [])
+          } finally {
+
+          }
+        })
     });
 
     // 高亮文本
