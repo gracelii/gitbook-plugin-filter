@@ -45,7 +45,7 @@ require([
     // var host = 'http://gateway.360aio.autoui.4pd.io';
     $('body').append()
 
-    var host = 'http://gateway.360aio.autoui';
+    var host = 'http://gateway.360cdh.autoui.4pd.io';
     $.get(`${host}/config-center/v1/versions`, function(data) {
         var response = data.data || {};
         // var configs = response.map(function(res) {return res.key});
