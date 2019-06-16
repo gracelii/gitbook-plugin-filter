@@ -41,27 +41,26 @@ require([
         'best practice': BEST_PRACTICE,
         'developer document': DEVELOPER_DOCUMENT
     }
-    // var host = window.host;
-    // var host = 'http://gateway.360aio.autoui.4pd.io';
-    $('body').append()
 
-    var host = 'http://gateway.360cdh.autoui.4pd.io';
-    $.get(`${host}/config-center/v1/versions`, function(data) {
+    $('body .book').hide();
+    // var __hidden_base_path__ = 'http://gateway.360cdh.autoui.4pd.io';
+    var __hidden_base_path__ = window.__hidden_base_path__ || '';
+    $.get(`${__hidden_base_path__}/config-center/v1/versions`, function(data) {
         var response = data.data || {};
-        // var configs = response.map(function(res) {return res.key});
-        var configs = ['ultron', 'app-wizard'];
-        var paths = [];
-        const hasModule = function (moduleConfigs, configs) {
+        var configs = response.map(function(res) {return res.key});
+        var deployedDataPaths = [];
+        const isModuleDeployed = function (moduleConfigs, configs) {
             return moduleConfigs.map(function(mConfig) {
-                return configs.indexOf(mConfig) >= 0
+                return configs.indexOf(mConfig) >= 0;
             }).every(function(item) {
                 return item;
             })
         }
+
         for(var module in MODULES_MAP) {
             var requiredConfigs = MODULES_MAP[module];
-            if (hasModule(requiredConfigs, configs)) {
-                paths.push(module);
+            if (isModuleDeployed(requiredConfigs, configs)) {
+                deployedDataPaths.push(module);
             }
         }
         $("ul.summary").children("li.chapter").each(function(i){
@@ -70,16 +69,17 @@ require([
                 .filter(function(v) {
                     return !(/^[.]*$/.test(v))
                 })[0];
-            if (path && paths.indexOf(path.toLowerCase()) < 0) {
+            if (path && deployedDataPaths.indexOf(path.toLowerCase()) < 0) {
                 $(this).hide();
             }
         })
+
+        $('body .book').show();
         
     })
     .fail(function() {
-
         $('.book').hide();
-        $('body').append('<div style="margin: auto; width: 200px; padding: 200px; font-size:200px">404 Not Found</div>')
+        $('body').append('<div id="notfound"">404 Not Found</div>')
     });
 
-})
+});
