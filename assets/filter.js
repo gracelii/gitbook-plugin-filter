@@ -43,9 +43,7 @@ require([
     }
 
     $('body .book').hide();
-    // var __hidden_base_path__ = 'http://gateway.360cdh.autoui.4pd.io';
-    var __hidden_base_path__ = window.__hidden_base_path__ || '';
-    $.get(`${__hidden_base_path__}/config-center/v1/versions`, function(data) {
+    $.get(`/config-center/v1/versions`, function(data) {
         var response = data.data || {};
         var configs = response.map(function(res) {return res.key});
         var deployedDataPaths = [];
